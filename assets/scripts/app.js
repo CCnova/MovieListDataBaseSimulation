@@ -36,7 +36,12 @@ const updateUI = () => {
     }
 };
 
-const deleteMovie = (movieId) => {
+const closeMovieDeletionModal = () => {
+    toggleBackDrop();
+    deleteMovieModal.classList.remove('visible');
+};
+
+const deleteMovieHandler = (movieId) => {
     let movieIndex = 0;
     for (const movie of movies) {
         if (movie.id === movieId) {
@@ -47,24 +52,29 @@ const deleteMovie = (movieId) => {
 
     movies.splice(movieIndex, 1);
     movieList.children[movieIndex].remove();
+
+    closeMovieDeletionModal();
 };
 
-const closeMovieDeletionModal = () => {
-    toggleBackDrop();
-    deleteMovieModal.classList.remove('visible');
-};
 
-const deleteMovieHandler = (movieId) => {
+
+const startDeleteMovieHandler = (movieId) => {
     deleteMovieModal.classList.add('visible');
     toggleBackDrop();
 
     const cancelDeleteButton = deleteMovieModal.querySelector('.modal__actions .btn--passive');
     
-    const confirmDeleteButton = deleteMovieModal.querySelector('.modal__actions .btn--danger');
+    let confirmDeleteButton = deleteMovieModal.querySelector('.modal__actions .btn--danger');
 
+    confirmDeleteButton.replaceWith(confirmDeleteButton.cloneNode(true));
+    confirmDeleteButton = deleteMovieModal.querySelector('.modal__actions .btn--danger');
+
+
+    cancelDeleteButton.removeEventListener('click', closeMovieDeletionModal);
+    
+    confirmDeleteButton.addEventListener('click', deleteMovieHandler.bind(null, movieId));
     cancelDeleteButton.addEventListener('click', closeMovieDeletionModal);
 
-    confirmDeleteButton.addEventListener('click', deleteMovie.bind(movieId));
 };
 
 const renderNewMovieElement = (id, title, imageUrl, rating) => {
@@ -82,7 +92,7 @@ const renderNewMovieElement = (id, title, imageUrl, rating) => {
     
     `;
 
-    newMovieElement.addEventListener('click', deleteMovieHandler.bind(null, id));
+    newMovieElement.addEventListener('click', startDeleteMovieHandler.bind(null, id));
 
     movieList.appendChild(newMovieElement);
 };
@@ -103,12 +113,14 @@ const showMovieModal = () => {
 
 const cancelAddMovie = () => {
     closeMovieModal();
+    toggleBackDrop();
     clearMovieInputs();
 };
 
 const backDropHandler = () => {
     closeMovieModal();
     closeMovieDeletionModal();
+    clearMovieInputs();
 };
 
 
