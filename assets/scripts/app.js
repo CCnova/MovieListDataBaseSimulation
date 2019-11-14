@@ -54,6 +54,7 @@ const deleteMovieHandler = (movieId) => {
     movieList.children[movieIndex].remove();
 
     closeMovieDeletionModal();
+    updateUI();
 };
 
 
